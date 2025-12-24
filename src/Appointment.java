@@ -1,7 +1,7 @@
 // Name: Daryn
 // Course: Object Oriented Programming
 // Project: Hospital Management System
-
+//s
 public class Appointment {
     private int id;
     private int patientId;
