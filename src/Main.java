@@ -1,7 +1,6 @@
 // Name: Daryn
 // Course: Object Oriented Programming
 // Project: Hospital Management System
-//s
 public class Main {
     public static void main(String[] args) {
 
