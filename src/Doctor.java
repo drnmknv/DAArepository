@@ -4,7 +4,16 @@ public class Doctor extends Person {
 
     public Doctor(int id, String name, int age, String specialty) {
         super(id, name, age, "Doctor");
-        this.specialty = specialty;
+        setSpecialty(specialty);
+    }
+
+    public void setSpecialty(String specialty) {
+        if (specialty != null && !specialty.trim().isEmpty()) {
+            this.specialty = specialty;
+        } else {
+            this.specialty = "General";
+            System.out.println("Invalid specialty, set to 'General'");
+        }
     }
 
     @Override

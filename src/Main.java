@@ -53,7 +53,7 @@ public class Main {
     private static void demonstratePolymorphism() {
         System.out.println("\n--- POLYMORPHISM ---");
         for (Person p : people) {
-            p.work(); // SAME METHOD, DIFFERENT OUTPUT
+            p.work();
         }
     }
 
