@@ -25,7 +25,7 @@ public abstract class Person {
     public int getAge() { return age; }
     public String getRole() { return role; }
 
-    // ====== SETTERS (MUST THROW, NOT PRINT) ======
+    // ====== SETTERS ======
     public void setId(int id) {
         if (id <= 0) throw new ValidationException("ID must be a positive number.");
         this.id = id;
