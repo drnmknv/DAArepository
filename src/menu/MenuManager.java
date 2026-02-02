@@ -24,7 +24,6 @@ public class MenuManager implements Menu {
         System.out.print("Choice: ");
     }
 
-
     @Override
     public void run() {
         while (true) {
@@ -44,21 +43,17 @@ public class MenuManager implements Menu {
                     default -> throw new ValidationException("Choice must be one of: 0,1,2,3,4");
                 }
 
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
-            }
-            catch (ValidationException e) {
+            } catch (ValidationException e) {
                 System.out.println("Input error: " + e.getMessage());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Unexpected error: " + e.getMessage());
             }
         }
     }
 
     private int readInt() {
-
         return Integer.parseInt(scanner.nextLine().trim());
     }
 
