@@ -1,134 +1,61 @@
 package menu;
 
-import exception.ValidationException;
-import model.Doctor;
-import model.Patient;
-import model.Person;
+import database.*;
+import model.*;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Scanner;
 
-public class MenuManager implements Menu {
+public class MenuManager {
 
-    private final ArrayList<Person> people = new ArrayList<>();
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner sc = new Scanner(System.in);
+    private final AppointmentDAO appointmentDAO = new AppointmentDAO();
 
-    @Override
-    public void displayMenu() {
-        System.out.println("\n=== HOSPITAL SYSTEM ===");
-        System.out.println("1) Add Patient");
-        System.out.println("2) Add Doctor");
-        System.out.println("3) View All (Polymorphism)");
-        System.out.println("4) View Doctors Only");
-        System.out.println("0) Exit");
-        System.out.print("Choice: ");
-    }
-
-    @Override
-    public void run() {
+    public void start() {
         while (true) {
-            try {
-                displayMenu();
-                int choice = readInt();
+            System.out.println("""
+            1 Add Patient
+            2 Add Doctor
+            3 Add Appointment
+            4 View Patients
+            5 View Doctors
+            6 View Appointments
+            7 Search Appointment by Status
+            8 Delete Appointment
+            9 Exit
+            """);
 
-                switch (choice) {
-                    case 1 -> addPatient();
-                    case 2 -> addDoctor();
-                    case 3 -> demonstratePolymorphism();
-                    case 4 -> viewDoctorsOnly();
-                    case 0 -> {
-                        System.out.println("Bye!");
-                        return;
-                    }
-                    default -> throw new ValidationException("Choice must be one of: 0,1,2,3,4");
+            int choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 3 -> {
+                    System.out.print("Patient ID: ");
+                    int pid = sc.nextInt();
+                    System.out.print("Doctor ID: ");
+                    int did = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Status: ");
+                    String st = sc.nextLine();
+                    appointmentDAO.insert(new Appointment(pid, did, LocalDate.now(), st));
                 }
-
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number.");
-            } catch (ValidationException e) {
-                System.out.println("Input error: " + e.getMessage());
-            } catch (Exception e) {
-                System.out.println("Unexpected error: " + e.getMessage());
+                case 6 -> appointmentDAO.getAll().forEach(System.out::println);
+                case 7 -> {
+                    System.out.print("Status keyword: ");
+                    String k = sc.nextLine();
+                    appointmentDAO.searchByStatus(k).forEach(System.out::println);
+                }
+                case 8 -> {
+                    System.out.print("Appointment ID: ");
+                    int id = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Type YES to confirm: ");
+                    if (sc.nextLine().equalsIgnoreCase("YES")) {
+                        appointmentDAO.deleteById(id);
+                    }
+                }
+                case 9 -> System.exit(0);
             }
         }
-    }
-
-    private int readInt() {
-        return Integer.parseInt(scanner.nextLine().trim());
-    }
-
-    private boolean readBoolean() {
-        String s = scanner.nextLine().trim().toLowerCase();
-        if (!s.equals("true") && !s.equals("false")) {
-            throw new ValidationException("Please type true or false.");
-        }
-        return Boolean.parseBoolean(s);
-    }
-
-    private void addPatient() {
-        System.out.println("\n--- ADD PATIENT ---");
-
-        System.out.print("Enter ID: ");
-        int id = readInt();
-
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Enter age: ");
-        int age = readInt();
-
-        System.out.print("Is admitted? (true/false): ");
-        boolean admitted = readBoolean();
-
-        Patient patient = new Patient(id, name, age, admitted);
-        people.add(patient);
-
-        System.out.println("Patient added.");
-    }
-
-    private void addDoctor() {
-        System.out.println("\n--- ADD DOCTOR ---");
-
-        System.out.print("Enter ID: ");
-        int id = readInt();
-
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Enter age: ");
-        int age = readInt();
-
-        System.out.print("Enter specialty: ");
-        String specialty = scanner.nextLine();
-
-        Doctor doctor = new Doctor(id, name, age, specialty);
-        people.add(doctor);
-
-        System.out.println("Doctor added.");
-    }
-
-    private void demonstratePolymorphism() {
-        System.out.println("\n--- POLYMORPHISM ---");
-        if (people.isEmpty()) {
-            System.out.println("No people yet.");
-            return;
-        }
-        for (Person p : people) {
-            p.work(); // abstract method overridden in children
-        }
-    }
-
-    private void viewDoctorsOnly() {
-        System.out.println("\n--- DOCTORS ONLY ---");
-        boolean found = false;
-
-        for (Person p : people) {
-            if (p instanceof Doctor d) {
-                System.out.println(d);
-                found = true;
-            }
-        }
-
-        if (!found) System.out.println("No doctors yet.");
     }
 }
