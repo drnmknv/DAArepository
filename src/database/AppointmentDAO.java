@@ -1,5 +1,4 @@
 package database;
-
 import database.DatabaseConnection;
 import model.Appointment;
 
@@ -7,6 +6,11 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+// sql
+// try
+// set
+//catch
 
 public class AppointmentDAO {
 
@@ -18,7 +22,8 @@ public class AppointmentDAO {
             ps.setString(2, a.getStatus());
             ps.setString(3, a.getDescription());
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             return false;
         }
     }
