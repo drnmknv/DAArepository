@@ -8,48 +8,27 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppointmentDAO implements DAO<Appointment> {
+public class AppointmentDAO {
 
     public boolean insert(Appointment a) {
-        String sql = "INSERT INTO appointments(patient_id, doctor_id, date, status) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO appointments(date, status, description) VALUES (?, ?, ?)";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, a.getPatientId());
-            ps.setInt(2, a.getDoctorId());
-            ps.setDate(3, Date.valueOf(a.getDate()));
-            ps.setString(4, a.getStatus());
+            ps.setDate(1, Date.valueOf(a.getDate()));
+            ps.setString(2, a.getStatus());
+            ps.setString(3, a.getDescription());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             return false;
         }
     }
 
-    public List<Appointment> searchByStatus(String keyword) {
-        List<Appointment> list = new ArrayList<>();
-        String sql = "SELECT * FROM appointments WHERE status ILIKE ?";
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, "%" + keyword + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(new Appointment(
-                        rs.getInt("id"),
-                        rs.getInt("patient_id"),
-                        rs.getInt("doctor_id"),
-                        rs.getDate("date").toLocalDate(),
-                        rs.getString("status")
-                ));
-            }
-        } catch (SQLException ignored) {}
-        return list;
-    }
-
-    public boolean update(Appointment a) {
+    public boolean updateStatus(int id, String status) {
         String sql = "UPDATE appointments SET status=? WHERE id=?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, a.getStatus());
-            ps.setInt(2, a.getId());
+            ps.setString(1, status);
+            ps.setInt(2, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             return false;
@@ -69,17 +48,55 @@ public class AppointmentDAO implements DAO<Appointment> {
 
     public List<Appointment> getAll() {
         List<Appointment> list = new ArrayList<>();
-        String sql = "SELECT * FROM appointments";
+        String sql = "SELECT * FROM appointments ORDER BY date";
         try (Connection con = DatabaseConnection.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(new Appointment(
                         rs.getInt("id"),
-                        rs.getInt("patient_id"),
-                        rs.getInt("doctor_id"),
                         rs.getDate("date").toLocalDate(),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getString("description")
+                ));
+            }
+        } catch (SQLException ignored) {}
+        return list;
+    }
+
+    public List<Appointment> searchByStatus(String keyword) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = "SELECT * FROM appointments WHERE status ILIKE ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new Appointment(
+                        rs.getInt("id"),
+                        rs.getDate("date").toLocalDate(),
+                        rs.getString("status"),
+                        rs.getString("description")
+                ));
+            }
+        } catch (SQLException ignored) {}
+        return list;
+    }
+
+    public List<Appointment> searchByDateRange(LocalDate from, LocalDate to) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = "SELECT * FROM appointments WHERE date BETWEEN ? AND ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(from));
+            ps.setDate(2, Date.valueOf(to));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new Appointment(
+                        rs.getInt("id"),
+                        rs.getDate("date").toLocalDate(),
+                        rs.getString("status"),
+                        rs.getString("description")
                 ));
             }
         } catch (SQLException ignored) {}
