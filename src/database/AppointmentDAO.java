@@ -7,10 +7,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-// sql
-// try
-// set
-//catch
+
+// sql     //arraylsit           //arraylist
+// PS     // sql                //sql
+// set      //PS                //PS
+// return   //RS                 //SET
+//catch    //while and list add    //RS , WHILE , LIST.ADD
 
 public class AppointmentDAO {
 
@@ -86,6 +88,27 @@ public class AppointmentDAO {
             }
         } catch (SQLException ignored) {}
         return list;
+    }
+
+    public Appointment getById(int id) {
+        String sql = "SELECT * FROM appointments WHERE id = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next()
+                        ? new Appointment(
+                        rs.getInt("id"),
+                        rs.getDate("date").toLocalDate(),
+                        rs.getString("status"),
+                        rs.getString("description")
+                )
+                        : null;
+            }
+
+        } catch (SQLException e) {
+            return null;
+        }
     }
 
     public List<Appointment> searchByDateRange(LocalDate from, LocalDate to) {
